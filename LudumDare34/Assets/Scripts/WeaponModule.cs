@@ -4,6 +4,7 @@ using System.Collections;
 public enum WeaponType {
     Bullet,
     Rocket,
+    Plasma,
     Laser
 }
 
@@ -20,50 +21,97 @@ public class WeaponModule : MonoBehaviour {
     public Transform tip;
 
     public Transform attachedTo;
-
+    public WeaponModule connectedWith;
+    
     public bool coreModule;
+    public bool attachedToHook;
   
 	// Use this for initialization
 
-    public void Shoot(BulletOwner owner, Quaternion shipRotation)
+    public void Shoot(ProjectileOwner owner, Quaternion shipRotation)
     {
         if(fireDelay<=0)
         {
             Debug.Log("Module " + name + " shoots bang bang");
             GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule?shipRotation:this.transform.rotation)) as GameObject;
+            Projectile proj = bulletObj.GetComponent<Projectile>();
+            proj.damage = this.damage;           
+            if(owner == ProjectileOwner.Enemy)
+            {
+                proj.sprite.color = Color.red;
+            }
+            else
+            {
+                proj.sprite.color = Color.yellow;
+            }
+            proj.owner = owner;
             fireDelay = fireRate;
+            
+        }
+    }
+
+    public void Disconnect()
+    {
+        if (connectedWith != null)
+        {
+            WeaponModule tmp = connectedWith;
+            this.connectedWith = null;
+            tmp.Disconnect();
+        }
+        this.attachedTo = null;
+        this.transform.parent = null;
+        this.attachedToHook = false;
+        Player ply = (attachedTo != null ? attachedTo.GetComponent<Player>() : null);
+        if (ply != null) ply.modules.Remove(this);
+        else
+        {
+            Enemy eny = (attachedTo != null ? attachedTo.GetComponent<Enemy>() : null);
+            if (eny != null) eny.modules.Remove(this);
         }
     }
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "PlayerShip")
+        if (col.gameObject.tag == "PlayerShip" && attachedToHook)
         {
           //  WeaponModule newModule = col.GetComponent<Collider>().gameObject.GetComponent<WeaponModule>();
             if (Hook.instance.attachedObject == this.gameObject) Hook.instance.attachedObject = null;
             this.transform.parent = Player.instance.modulesRoot;
             this.attachedTo = Player.instance.transform;
-            Player.instance.modules.Add(this);
-            GameObject newPopup = Instantiate(PrefabManager.instance.textPopup, new Vector3(this.transform.position.x, this.transform.position.y, -5f), Quaternion.identity) as GameObject;
-            newPopup.GetComponent<Popup>().mesh.text = this.name;
+            attachedToHook = false;
+            Player.AddModule(this);
         }
 
-        if(col.gameObject.tag == "Module")
+        if (col.gameObject.tag == "Module" && attachedToHook)
         {
             WeaponModule other = col.GetComponent<WeaponModule>();
             if(other != null)
+            if(other.attachedTo!=null)
             if(other.attachedTo.tag=="PlayerShip")
             {
                 if (Hook.instance.attachedObject == this.gameObject) Hook.instance.attachedObject = null;
                 this.transform.parent = Player.instance.modulesRoot;
                 this.attachedTo = Player.instance.transform;
-                Player.instance.modules.Add(this);
-                GameObject newPopup = Instantiate(PrefabManager.instance.textPopup, new Vector3(this.transform.position.x, this.transform.position.y, -5f), Quaternion.identity) as GameObject;
-                newPopup.GetComponent<Popup>().mesh.text = this.name;
+                other.connectedWith = this;
+                attachedToHook = false;
+                Player.AddModule(this);
             }
         }
     }
 
+    public void Hit(int dmg)
+    {
+        this.hp -= dmg;
+        if (this.hp < 0)
+        {
+            PrefabManager.DeployExplosionParticles(this.transform.position, 0.5f);
+            if (this.connectedWith != null) this.connectedWith.Disconnect();
+
+            Destroy(this.gameObject);
+        }
+    }
+
+    
 
 	void Start () {
 	

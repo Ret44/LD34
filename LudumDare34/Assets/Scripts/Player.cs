@@ -37,6 +37,18 @@ public class Player : MonoBehaviour {
     //    }
     //}
 
+    public static bool AddModule(WeaponModule newModule)
+    {
+
+        for(int i=0;i<instance.modules.Count;i++)
+        {
+            if (instance.modules[i] == newModule) return false;
+        }
+        instance.modules.Add(newModule);
+        GameObject newPopup = Instantiate(PrefabManager.instance.textPopup, new Vector3(instance.transform.position.x, instance.transform.position.y, -5f), Quaternion.identity) as GameObject;
+        newPopup.GetComponent<Popup>().mesh.text = newModule.name;
+        return true;
+    }
 	// Use this for initialization
 	void Start () {
 	
@@ -45,24 +57,23 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        if (Input.GetKey(KeyCode.R)) Application.LoadLevel("mainscene");
+
+
         var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         transform.position += move * (isShooting?shootVelocity:velocity) * Time.deltaTime;
      
         if(Input.GetMouseButton(0))
         {
             for (int i = 0; i < modules.Count; i++)
-                modules[i].Shoot(BulletOwner.Player, spriteTransform.rotation);
+                modules[i].Shoot(ProjectileOwner.Player, spriteTransform.rotation);
         }
         
         isShooting = !(Input.GetMouseButtonDown(0));        
 
         if(Input.GetMouseButton(1))
         {
-            if (!hook.extending)
-            {
-                hook.transform.rotation = spriteTransform.rotation;
-                hook.extending = true;
-            }
+            Hook.Fire(spriteTransform.rotation);
         }
     }
 

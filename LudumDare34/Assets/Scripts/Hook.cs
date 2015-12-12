@@ -11,10 +11,14 @@ public class Hook : MonoBehaviour {
     public float speed;
     public GameObject attachedObject;
     private VectorLine line;
+    public bool ready;
+
+    public Transform midPoint;
 
     void Awake()
     {
         instance = this;
+        ready = true;
     }
 
     // Use this for initialization
@@ -29,12 +33,23 @@ public class Hook : MonoBehaviour {
     void OnTriggerEnter(Collider coll)
     {
         WeaponModule module = coll.GetComponent<WeaponModule>();
-        if (module !=null && attachedObject==null && module.attachedTo ==null)
+        if (module !=null && attachedObject==null && module.attachedTo ==null && !ready)
         {
             attachedObject = coll.gameObject;
             attachedObject.transform.parent = this.transform;
+            module.attachedToHook = true;
             attachedObject.GetComponent<WeaponModule>().attachedTo = this.transform;
             extending = false;
+        }
+    }
+
+    public static void Fire(Quaternion targetRotation)
+    {
+        if(instance.ready)
+        {
+            instance.transform.rotation = targetRotation;
+            instance.extending = true;
+            instance.midPoint.position = instance.transform.position;
         }
     }
     
@@ -44,14 +59,21 @@ public class Hook : MonoBehaviour {
 
         if(extending)
         {
+            ready = false;
             this.transform.position += transform.up * speed * Time.deltaTime;
             if (Vector3.Distance(this.transform.position, source.position)>length)
                 extending = false;
         }
         else
         {
-            if (Vector3.Distance(this.transform.position, source.position) > 0)
-                this.transform.position = Vector3.MoveTowards(this.transform.position, source.position, (attachedObject!=null?speed*0.75f:speed) * Time.deltaTime);
+            if (Vector3.Distance(this.transform.position, source.position) > 0f)
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, source.position, (attachedObject != null ? speed * 0.75f : speed) * Time.deltaTime);
+                midPoint.position = Vector3.MoveTowards(this.transform.position, source.position, Time.deltaTime * speed * 2f);
+            }
+            
+            if(Vector3.Distance(this.transform.position, source.position) < 0.25f) ready = true;
+
         }
 
 
