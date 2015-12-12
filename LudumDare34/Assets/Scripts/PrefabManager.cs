@@ -9,6 +9,8 @@ public class PrefabManager : MonoBehaviour {
     public GameObject rocket;
     [Header("Modules")]
     public GameObject standardModule;
+    [Header("Popups")]
+    public GameObject textPopup;
 //[Header("Enemies")]
 
 

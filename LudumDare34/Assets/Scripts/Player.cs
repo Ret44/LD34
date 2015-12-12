@@ -4,17 +4,38 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour {
 
+    public static Player instance;
+
     public GameObject crosshair;
     public float velocity;
     public float shootVelocity;
     public bool isShooting;
     public List<WeaponModule> modules;
-    private Transform spriteTransform;
+    public Transform spriteTransform;
+
+    public Transform modulesRoot;
+
+    public Hook hook;
+    
     void Awake()
     {
+        instance = this;
         this.crosshair = GameObject.Find("crosshair") as GameObject;
-        this.spriteTransform = this.transform.GetChild(0);
     }
+
+    //void OnTriggerEnter(Collider col)
+    //{
+    //    Debug.Log("Kolizja");
+    //    if (col.gameObject.tag == "Module")
+    //    {
+    //        WeaponModule newModule = col.gameObject.GetComponent<WeaponModule>();
+    //        if(newModule.attachedTo!=null) newModule.attachedTo.GetComponent<Hook>().attachedObject = null;
+    //        newModule.transform.parent = modulesRoot;
+    //        newModule.attachedTo = this.transform;
+    //        modules.Add(newModule);
+                        
+    //    }
+    //}
 
 	// Use this for initialization
 	void Start () {
@@ -34,6 +55,15 @@ public class Player : MonoBehaviour {
         }
         
         isShooting = !(Input.GetMouseButtonDown(0));        
+
+        if(Input.GetMouseButton(1))
+        {
+            if (!hook.extending)
+            {
+                hook.transform.rotation = spriteTransform.rotation;
+                hook.extending = true;
+            }
+        }
     }
 
 }
