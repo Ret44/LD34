@@ -45,6 +45,10 @@ public class WeaponModule : MonoBehaviour {
                 proj.sprite.color = Color.yellow;
             }
             proj.owner = owner;
+            if(type==WeaponType.Laser)
+            {
+                proj.transform.parent = this.transform;
+            }
             fireDelay = fireRate;
             
         }
@@ -111,7 +115,7 @@ public class WeaponModule : MonoBehaviour {
         }
     }
 
-    
+
 
 	void Start () {
 	

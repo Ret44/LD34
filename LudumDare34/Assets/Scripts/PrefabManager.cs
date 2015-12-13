@@ -4,10 +4,12 @@ using System.Collections;
 public class PrefabManager : MonoBehaviour {
 
     public static PrefabManager instance;
+
     [Header("Bullets")]
     public GameObject cannonBullet;
     public GameObject plasmaBullet;
     public GameObject rocket;
+    public GameObject laserBeam;
     [Header("Modules")]
     public GameObject standardModule;
     [Header("Popups")]
@@ -15,9 +17,10 @@ public class PrefabManager : MonoBehaviour {
     [Header("Particles")]
     public GameObject hitParticles;
     public GameObject explosionParticles;
-//[Header("Enemies")]
-
-
+    [Header("Enemies")]
+    public GameObject fighter;
+    public GameObject cruiser;
+    
 
     void Awake()
     {
@@ -43,6 +46,7 @@ public class PrefabManager : MonoBehaviour {
             case WeaponType.Bullet: return instance.cannonBullet;
             case WeaponType.Rocket: return instance.rocket;
             case WeaponType.Plasma: return instance.plasmaBullet;
+            case WeaponType.Laser: return instance.laserBeam;
             default: return instance.cannonBullet;
         }
     }
