@@ -40,6 +40,18 @@ public class Projectile : MonoBehaviour
             PrefabManager.DeployHitParticles(this.transform.position);
             Destroy(this.gameObject);
         }
+        if (col.gameObject.tag == "PlayerShip" && this.owner == ProjectileOwner.Enemy)
+        {
+            Player.Hit(damage);
+            PrefabManager.DeployHitParticles(this.transform.position);
+            Destroy(this.gameObject);
+        }
+        if (col.gameObject.tag == "Kamikaze" && this.owner == ProjectileOwner.Player)
+        {
+            col.transform.parent.gameObject.GetComponent<Enemy>().Hit(damage);
+            PrefabManager.DeployHitParticles(this.transform.position);
+            Destroy(this.gameObject);
+        }
         if(col.gameObject.tag=="Hook")
         {
             PrefabManager.DeployHitParticles(this.transform.position);

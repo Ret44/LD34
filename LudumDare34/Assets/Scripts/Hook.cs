@@ -13,6 +13,8 @@ public class Hook : MonoBehaviour {
     private VectorLine line;
     public bool ready;
 
+    public float timeScaleController;
+
     public Transform midPoint;
 
     void Awake()
@@ -25,6 +27,7 @@ public class Hook : MonoBehaviour {
 	void Start () {
         line = VectorLine.SetLine(Color.white, new Vector2(this.transform.position.x,this.transform.position.y), new Vector2(source.position.x, source.position.y));
         line.SetWidth(0.15f);
+        line.SetColor(new Color32(134,134,134,255));
         Canvas vectorCanvas = GameObject.Find("VectorCanvas").GetComponent<Canvas>();
         line.SetCanvas(vectorCanvas);
         vectorCanvas.renderMode = RenderMode.WorldSpace;        
@@ -35,6 +38,7 @@ public class Hook : MonoBehaviour {
         WeaponModule module = coll.GetComponent<WeaponModule>();
         if (module !=null && attachedObject==null && module.attachedTo ==null && !ready)
         {
+            timeScaleController = 0.1f;
             attachedObject = coll.gameObject;
             attachedObject.transform.parent = this.transform;
             module.attachedToHook = true;
@@ -56,6 +60,12 @@ public class Hook : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        if (timeScaleController < 1f) timeScaleController += Time.deltaTime * 3;
+        else timeScaleController = 1f;
+        
+        ///if()
+        
+        Time.timeScale = timeScaleController;
 
         if(extending)
         {

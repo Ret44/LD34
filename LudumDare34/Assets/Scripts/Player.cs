@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -7,6 +8,9 @@ public class Player : MonoBehaviour {
     public static Player instance;
 
     public GameObject crosshair;
+    public int HP;
+    public int MaxHP;
+    private Text hullUI;
     public float velocity;
     public float shootVelocity;
     public bool isShooting;
@@ -21,21 +25,38 @@ public class Player : MonoBehaviour {
     {
         instance = this;
         this.crosshair = GameObject.Find("crosshair") as GameObject;
+        hullUI = GameObject.Find("hullUI").GetComponent<Text>();
     }
 
-    //void OnTriggerEnter(Collider col)
-    //{
-    //    Debug.Log("Kolizja");
-    //    if (col.gameObject.tag == "Module")
-    //    {
-    //        WeaponModule newModule = col.gameObject.GetComponent<WeaponModule>();
-    //        if(newModule.attachedTo!=null) newModule.attachedTo.GetComponent<Hook>().attachedObject = null;
-    //        newModule.transform.parent = modulesRoot;
-    //        newModule.attachedTo = this.transform;
-    //        modules.Add(newModule);
-                        
-    //    }
-    //}
+    void OnTriggerEnter(Collider col)
+    {
+        if(col.gameObject.tag=="Kamikaze")
+        {
+            Enemy enemy = col.transform.parent.GetComponent<Enemy>();
+            int playerDmg = 50;
+            int enemyDmg = Player.instance.HP;
+            enemy.Hit(enemyDmg);
+            Player.Hit(playerDmg);
+        }
+        if (col.gameObject.tag == "EnemyShip")
+        {
+            Enemy enemy = col.GetComponent<Enemy>();
+            int playerDmg = enemy.hp;
+            int enemyDmg = Player.instance.HP;
+            enemy.Hit(enemyDmg);
+            Player.Hit(playerDmg);
+        }
+        if (col.gameObject.tag == "Module")
+        {
+            WeaponModule module = col.gameObject.GetComponent<WeaponModule>();
+            if(module.attachedTo!=null)
+                if(module.attachedTo.tag=="EnemyShip")
+                {
+                    Player.Hit(Mathf.Abs(module.hp));
+                    module.Hit(Player.instance.HP);                    
+                }
+        }
+    }
 
     public static bool AddModule(WeaponModule newModule)
     {
@@ -49,6 +70,23 @@ public class Player : MonoBehaviour {
         newPopup.GetComponent<Popup>().mesh.text = newModule.name;
         return true;
     }
+
+    public static void Hit(int dmg)
+    {
+        instance.HP -= dmg;
+
+        if (instance.HP <= 0)
+        {
+            PrefabManager.DeployExplosionParticles(instance.transform.position,1.2f);
+            GameObject[] kamikazis = GameObject.FindGameObjectsWithTag("Kamikaze");
+            foreach(GameObject kamikaze in kamikazis)
+            {
+                kamikaze.transform.parent.parent = null;
+                kamikaze.transform.parent.GetComponent<Enemy>().Hit(9999);
+            }
+            Destroy(instance.gameObject);
+        }
+    }
 	// Use this for initialization
 	void Start () {
 	
@@ -59,6 +97,7 @@ public class Player : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.R)) Application.LoadLevel("mainscene");
 
+        hullUI.text = (this.HP * 100 / MaxHP).ToString() + "%";
 
         var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         transform.position += move * (isShooting?shootVelocity:velocity) * Time.deltaTime;

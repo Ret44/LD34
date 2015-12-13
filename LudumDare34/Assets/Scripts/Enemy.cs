@@ -27,7 +27,7 @@ public class Enemy : MonoBehaviour {
                     modules[i].transform.parent = null;
                 }
             }
-            PrefabManager.DeployExplosionParticles(this.transform.position, 1f);
+            PrefabManager.DeployExplosionParticles((this.tag == "EnemyShip" ? this.transform.position : this.spriteTransform.position), 1f);
             Destroy(this.gameObject);
         }
     }

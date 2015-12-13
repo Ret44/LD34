@@ -20,6 +20,8 @@ public class PrefabManager : MonoBehaviour {
     [Header("Enemies")]
     public GameObject fighter;
     public GameObject cruiser;
+    public GameObject laser;
+    public GameObject kamikaze;
     
 
     void Awake()
@@ -51,6 +53,18 @@ public class PrefabManager : MonoBehaviour {
         }
     }
 
+
+    public static GameObject GetEnemyPrefab(EnemyType type)
+    {
+        switch (type)
+        {
+            case EnemyType.Fighter: return instance.fighter;
+            case EnemyType.Cruiser: return instance.cruiser;
+            case EnemyType.Laser: return instance.laser;
+            case EnemyType.Kamikaze: return instance.kamikaze;
+            default: return instance.fighter;
+        }
+    }
 	// Use this for initialization
 	void Start () {
 	

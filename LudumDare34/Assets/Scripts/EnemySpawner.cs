@@ -1,7 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FighterSpawner : MonoBehaviour {
+public enum EnemyType
+{
+    Fighter,
+    Cruiser,
+    Laser,
+    Kamikaze
+}
+
+public class EnemySpawner : MonoBehaviour {
     
     public Transform spawnerLocation;
 
@@ -10,6 +18,8 @@ public class FighterSpawner : MonoBehaviour {
     public float spawnDelay;
     public int spawnsLeft;
     private float delay;
+
+    public EnemyType type;
 
     public void Spawn(int count)
     {
@@ -27,7 +37,15 @@ public class FighterSpawner : MonoBehaviour {
         {
             if (delay <= 0)
             {
-                Instantiate(PrefabManager.instance.fighter, spawnerLocation.position, Quaternion.identity);
+                if (type != EnemyType.Kamikaze)
+                {
+                    Instantiate(PrefabManager.GetEnemyPrefab(type), spawnerLocation.position, Quaternion.identity);
+                }
+                else
+                {
+                    GameObject kami = Instantiate(PrefabManager.GetEnemyPrefab(type), Player.instance.transform.position, Quaternion.identity) as GameObject;
+                    kami.transform.parent = Player.instance.transform;
+                }
                 delay = spawnDelay;
                 spawnsLeft--;
             }
