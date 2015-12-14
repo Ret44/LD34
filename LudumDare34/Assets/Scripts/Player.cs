@@ -3,6 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+
+public enum ShipState
+{
+    Running,
+    Dying
+}
+
 public class Player : MonoBehaviour {
 
     public static Player instance;
@@ -20,7 +27,7 @@ public class Player : MonoBehaviour {
     public Transform modulesRoot;
 
     public Hook hook;
-    
+    public
     void Awake()
     {
         instance = this;
@@ -94,9 +101,7 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        if (Input.GetKey(KeyCode.R)) Application.LoadLevel("mainscene");
-
+        
         hullUI.text = (this.HP * 100 / MaxHP).ToString() + "%";
 
         var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);

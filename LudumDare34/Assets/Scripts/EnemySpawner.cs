@@ -14,7 +14,8 @@ public class EnemySpawner : MonoBehaviour {
     public Transform spawnerLocation;
 
     public bool isSpawning;
-    public int fightersCount;
+    public int spawnCount;
+    public float mainDelay;
     public float spawnDelay;
     public int spawnsLeft;
     private float delay;
@@ -35,22 +36,25 @@ public class EnemySpawner : MonoBehaviour {
 	void Update () {
 	    if(isSpawning)
         {
-            if (delay <= 0)
+            if (delay <= 0 && mainDelay <= 0)
             {
                 if (type != EnemyType.Kamikaze)
                 {
-                    Instantiate(PrefabManager.GetEnemyPrefab(type), spawnerLocation.position, Quaternion.identity);
+                    GameObject enemy = Instantiate(PrefabManager.GetEnemyPrefab(type), spawnerLocation.position, Quaternion.identity) as GameObject;
+                    GameStateManager.instance.enemies.Add(enemy.transform);
                 }
                 else
                 {
                     GameObject kami = Instantiate(PrefabManager.GetEnemyPrefab(type), Player.instance.transform.position, Quaternion.identity) as GameObject;
                     kami.transform.parent = Player.instance.transform;
+                    GameStateManager.instance.enemies.Add(kami.transform);
                 }
                 delay = spawnDelay;
                 spawnsLeft--;
             }
 
             delay -= Time.deltaTime;
+            mainDelay -= Time.deltaTime;
 
             if (spawnsLeft == 0)
                 isSpawning = false;

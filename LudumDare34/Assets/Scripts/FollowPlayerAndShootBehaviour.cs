@@ -9,24 +9,27 @@ public class FollowPlayerAndShootBehaviour : EnemyBehaviour
     public float fireDelay;
     void Update()
     {
-        var offset = new Vector2(Player.instance.transform.position.x - this.transform.position.x, Player.instance.transform.position.y - this.transform.position.y);
-        var angle = Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle - 90);
-        if (Vector3.Distance(this.transform.position, Player.instance.transform.position) > safeDistance)
+        if (GameStateManager.GetState() != GameState.GameOver)
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, Player.instance.transform.position, velocity * Time.deltaTime);
-        }
-        else if (Vector3.Distance(this.transform.position, Player.instance.transform.position) < safeDistance/2)
-        {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, -Player.instance.transform.position, velocity * Time.deltaTime);
-        }
+            var offset = new Vector2(Player.instance.transform.position.x - this.transform.position.x, Player.instance.transform.position.y - this.transform.position.y);
+            var angle = Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+            if (Vector3.Distance(this.transform.position, Player.instance.transform.position) > safeDistance)
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, Player.instance.transform.position, velocity * Time.deltaTime);
+            }
+            else if (Vector3.Distance(this.transform.position, Player.instance.transform.position) < safeDistance / 2)
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, -Player.instance.transform.position, velocity * Time.deltaTime);
+            }
 
-        fireDelay -= Time.deltaTime;
-        if(fireDelay <= 0)
-        {
-            this.ship.Fire();
-            fireDelay = fireRate;
-        }
+            fireDelay -= Time.deltaTime;
+            if (fireDelay <= 0)
+            {
+                this.ship.Fire();
+                fireDelay = fireRate;
+            }
+        } 
     }
 
 }

@@ -32,25 +32,27 @@ public class WeaponModule : MonoBehaviour {
     {
         if(fireDelay<=0)
         {
-            Debug.Log("Module " + name + " shoots bang bang");
-            GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule?shipRotation:this.transform.rotation)) as GameObject;
-            Projectile proj = bulletObj.GetComponent<Projectile>();
-            proj.damage = this.damage;           
-            if(owner == ProjectileOwner.Enemy)
+            if (tip != null)
             {
-                proj.sprite.color = Color.red;
+                Debug.Log("Module " + name + " shoots bang bang");
+                GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule ? shipRotation : this.transform.rotation)) as GameObject;
+                Projectile proj = bulletObj.GetComponent<Projectile>();
+                proj.damage = this.damage;
+                if (owner == ProjectileOwner.Enemy)
+                {
+                    proj.sprite.color = Color.red;
+                }
+                else
+                {
+                    proj.sprite.color = Color.yellow;
+                }
+                proj.owner = owner;
+                if (type == WeaponType.Laser)
+                {
+                    proj.transform.parent = this.transform;
+                }
+                fireDelay = fireRate;
             }
-            else
-            {
-                proj.sprite.color = Color.yellow;
-            }
-            proj.owner = owner;
-            if(type==WeaponType.Laser)
-            {
-                proj.transform.parent = this.transform;
-            }
-            fireDelay = fireRate;
-            
         }
     }
 

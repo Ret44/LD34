@@ -59,38 +59,41 @@ public class Hook : MonoBehaviour {
     
 	// Update is called once per frame
 	void Update () {
-
-        if (timeScaleController < 1f) timeScaleController += Time.deltaTime * 3;
-        else timeScaleController = 1f;
-        
-        ///if()
-        
-        Time.timeScale = timeScaleController;
-
-        if(extending)
+        if (GameStateManager.GetState() != GameState.GameOver)
         {
-            ready = false;
-            this.transform.position += transform.up * speed * Time.deltaTime;
-            if (Vector3.Distance(this.transform.position, source.position)>length)
-                extending = false;
-        }
-        else
-        {
-            if (Vector3.Distance(this.transform.position, source.position) > 0f)
+            if (timeScaleController < 1f) timeScaleController += Time.deltaTime * 3;
+            else timeScaleController = 1f;
+
+            ///if()
+
+            Time.timeScale = timeScaleController;
+            if (Player.instance != null)
             {
-                this.transform.position = Vector3.MoveTowards(this.transform.position, source.position, (attachedObject != null ? speed * 0.75f : speed) * Time.deltaTime);
-                midPoint.position = Vector3.MoveTowards(this.transform.position, source.position, Time.deltaTime * speed * 2f);
+                if (extending)
+                {
+                    ready = false;
+                    this.transform.position += transform.up * speed * Time.deltaTime;
+                    if (Vector3.Distance(this.transform.position, source.position) > length)
+                        extending = false;
+                }
+                else
+                {
+                    if (Vector3.Distance(this.transform.position, source.position) > 0f)
+                    {
+                        this.transform.position = Vector3.MoveTowards(this.transform.position, source.position, (attachedObject != null ? speed * 0.75f : speed) * Time.deltaTime);
+                        midPoint.position = Vector3.MoveTowards(this.transform.position, source.position, Time.deltaTime * speed * 2f);
+                    }
+
+                    if (Vector3.Distance(this.transform.position, source.position) < 0.25f) ready = true;
+
+                }
+
+
+                line.points2.Clear();
+                line.points2.Add(new Vector2(this.transform.position.x, this.transform.position.y));
+                line.points2.Add(new Vector2(source.position.x, source.position.y));
+                line.Draw();
             }
-            
-            if(Vector3.Distance(this.transform.position, source.position) < 0.25f) ready = true;
-
         }
-
-
-        line.points2.Clear();
-        line.points2.Add(new Vector2(this.transform.position.x, this.transform.position.y));
-        line.points2.Add(new Vector2(source.position.x, source.position.y));
-        line.Draw();
-
 	}
 }

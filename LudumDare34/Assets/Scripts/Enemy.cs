@@ -5,11 +5,19 @@ using System.Collections.Generic;
 public class Enemy : MonoBehaviour {
 
     public int hp;
+    private int maxHP;
     public float velocity;
     public bool isShooting;
     public List<WeaponModule> modules;
     public Transform spriteTransform;
+    private SpriteRenderer sprite;
     public Transform modulesRoot;	// Use this for initialization
+
+    void Awake()
+    {
+        maxHP = hp;
+        sprite = spriteTransform.GetComponent<SpriteRenderer>();
+    }
 	void Start () {
 	
 	}
@@ -28,6 +36,7 @@ public class Enemy : MonoBehaviour {
                 }
             }
             PrefabManager.DeployExplosionParticles((this.tag == "EnemyShip" ? this.transform.position : this.spriteTransform.position), 1f);
+            GameStateManager.instance.enemies.Remove(this.transform);
             Destroy(this.gameObject);
         }
     }
@@ -42,6 +51,6 @@ public class Enemy : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	
+	    //spriteTransform.
 	}
 }
