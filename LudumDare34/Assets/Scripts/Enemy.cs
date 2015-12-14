@@ -11,10 +11,12 @@ public class Enemy : MonoBehaviour {
     public List<WeaponModule> modules;
     public Transform spriteTransform;
     private SpriteRenderer sprite;
+    private float blink;
     public Transform modulesRoot;	// Use this for initialization
 
     void Awake()
     {
+        blink = 1f;
         maxHP = hp;
         sprite = spriteTransform.GetComponent<SpriteRenderer>();
     }
@@ -25,6 +27,7 @@ public class Enemy : MonoBehaviour {
     public void Hit(int dmg)
     {
         this.hp -= dmg;
+        blink = 0.5f;
         if (this.hp < 0)
         {
             for (int i = 0; i < modules.Count;i++ )
@@ -51,6 +54,11 @@ public class Enemy : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        if(blink<1f) {       
+            blink += Time.deltaTime * 2;
+        } else  blink = 1f;
+
+        sprite.color = new Color(1f, blink, blink);
 	    //spriteTransform.
 	}
 }

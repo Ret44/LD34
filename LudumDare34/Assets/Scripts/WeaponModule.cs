@@ -18,7 +18,9 @@ public class WeaponModule : MonoBehaviour {
     private float fireDelay;
 
     public SpriteRenderer sprite;
+    private float blink;
     public Transform tip;
+
 
     public Transform attachedTo;
     public WeaponModule connectedWith;
@@ -40,11 +42,11 @@ public class WeaponModule : MonoBehaviour {
         proj.damage = this.damage;
         if (tmpOwner == ProjectileOwner.Enemy)
         {
-            proj.sprite.color = Color.red;
+            proj.sprite.color = new Color32(134, 134, 134,255);
         }
         else
         {
-            proj.sprite.color = Color.yellow;
+            proj.sprite.color = Color.white;
         }
         proj.owner = tmpOwner;
         if (type == WeaponType.Laser)
@@ -121,6 +123,7 @@ public class WeaponModule : MonoBehaviour {
     public void Hit(int dmg)
     {
         this.hp -= dmg;
+        blink = 0.5f;
         if (this.hp < 0)
         {
             PrefabManager.DeployExplosionParticles(this.transform.position, 0.5f);
@@ -133,12 +136,20 @@ public class WeaponModule : MonoBehaviour {
 
 
 	void Start () {
-	
+        blink = 1f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
         fireDelay -= Time.deltaTime;
+
+        if (blink < 1f)
+        {
+            blink += Time.deltaTime * 2;
+        }
+        else blink = 1f;
+
+        sprite.color = new Color(1f, blink, blink);
 
         if(attachedTo!=null)
         if(attachedTo.tag == "PlayerShip")
