@@ -25,8 +25,34 @@ public class WeaponModule : MonoBehaviour {
     
     public bool coreModule;
     public bool attachedToHook;
-  
+
+    private ProjectileOwner tmpOwner;
+    private Quaternion tmpRotation;
+
 	// Use this for initialization
+
+
+    public void DispatchBullet()
+    {
+        Debug.Log("Module " + name + " shoots bang bang");
+        GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule ? tmpRotation : this.transform.rotation)) as GameObject;
+        Projectile proj = bulletObj.GetComponent<Projectile>();
+        proj.damage = this.damage;
+        if (tmpOwner == ProjectileOwner.Enemy)
+        {
+            proj.sprite.color = Color.red;
+        }
+        else
+        {
+            proj.sprite.color = Color.yellow;
+        }
+        proj.owner = tmpOwner;
+        if (type == WeaponType.Laser)
+        {
+            proj.transform.parent = this.transform;
+        }
+        fireDelay = fireRate;
+    }
 
     public void Shoot(ProjectileOwner owner, Quaternion shipRotation)
     {
@@ -34,24 +60,11 @@ public class WeaponModule : MonoBehaviour {
         {
             if (tip != null)
             {
-                Debug.Log("Module " + name + " shoots bang bang");
-                GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule ? shipRotation : this.transform.rotation)) as GameObject;
-                Projectile proj = bulletObj.GetComponent<Projectile>();
-                proj.damage = this.damage;
-                if (owner == ProjectileOwner.Enemy)
-                {
-                    proj.sprite.color = Color.red;
-                }
-                else
-                {
-                    proj.sprite.color = Color.yellow;
-                }
-                proj.owner = owner;
-                if (type == WeaponType.Laser)
-                {
-                    proj.transform.parent = this.transform;
-                }
-                fireDelay = fireRate;
+                tmpOwner = owner;
+                tmpRotation = shipRotation;
+                if(type==WeaponType.Laser) this.GetComponent<Animator>().SetTrigger("Fire");
+                else DispatchBullet();
+
             }
         }
     }

@@ -85,7 +85,9 @@ public class GameStateManager : MonoBehaviour {
     
     public void StartNextWave()
     {
+
         this.wave++;
+             //   Debug.Log("Starting new wave no."+this.wave.ToString() + " )
         if (this.wave > waves.Count) this.wave = 0;
         List<WaveParam> wave = waves[this.wave];
             foreach (WaveParam param in wave)
