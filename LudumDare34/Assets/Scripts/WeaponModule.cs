@@ -42,7 +42,8 @@ public class WeaponModule : MonoBehaviour {
         proj.damage = this.damage;
         if (tmpOwner == ProjectileOwner.Enemy)
         {
-            proj.sprite.color = new Color32(134, 134, 134,255);
+            proj.sprite.color = new Color32(223, 74, 49, 255);
+
         }
         else
         {
