@@ -17,6 +17,9 @@ public class WeaponModule : MonoBehaviour {
     public float fireRate;
     private float fireDelay;
 
+    public Vector3 direction;
+    public float velocity;
+
     public SpriteRenderer sprite;
     private float blink;
     public Transform tip;
@@ -27,6 +30,8 @@ public class WeaponModule : MonoBehaviour {
     
     public bool coreModule;
     public bool attachedToHook;
+
+    public float deathTimer;
 
     private ProjectileOwner tmpOwner;
     private Quaternion tmpRotation;
@@ -55,6 +60,8 @@ public class WeaponModule : MonoBehaviour {
             proj.transform.parent = this.transform;
         }
         fireDelay = fireRate;
+
+        SoundPlayer.PlayWeaponSound(this.type);
     }
 
     public void Shoot(ProjectileOwner owner, Quaternion shipRotation)
@@ -90,6 +97,10 @@ public class WeaponModule : MonoBehaviour {
             Enemy eny = (attachedTo != null ? attachedTo.GetComponent<Enemy>() : null);
             if (eny != null) eny.modules.Remove(this);
         }
+
+        direction = new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), 0f);
+        velocity = Random.Range(2f, 3.5f);
+        deathTimer = 5f;
     }
 
     void OnTriggerEnter(Collider col)
@@ -123,15 +134,24 @@ public class WeaponModule : MonoBehaviour {
 
     public void Hit(int dmg)
     {
-        this.hp -= dmg;
-        blink = 0.5f;
-        if (this.hp < 0)
-        {
-            PrefabManager.DeployExplosionParticles(this.transform.position, 0.5f);
-            if (this.connectedWith != null) this.connectedWith.Disconnect();
+        if(this.attachedTo!=null)
+            if (this.attachedTo.tag == "PlayerShip")
+            {
+                Player.Hit(dmg);
+            }
+            else if (this.attachedTo.tag == "EnemyShip")
+            {
+                this.attachedTo.GetComponent<Enemy>().Hit(dmg);
+            }
+        //this.hp -= dmg;
+        //blink = 0.5f;
+        //if (this.hp < 0)
+        //{
+        //    PrefabManager.DeployExplosionParticles(this.transform.position, 0.5f);
+        //    if (this.connectedWith != null) this.connectedWith.Disconnect();
 
-            Destroy(this.gameObject);
-        }
+        //    Destroy(this.gameObject);
+        //}
     }
 
 
@@ -151,6 +171,19 @@ public class WeaponModule : MonoBehaviour {
         else blink = 1f;
 
         sprite.color = new Color(1f, blink, blink);
+
+        if(attachedTo==null)
+        {
+            this.transform.Translate(direction * Time.deltaTime * velocity);
+            this.transform.Rotate(Vector3.forward * Time.deltaTime * velocity);
+            deathTimer -= Time.deltaTime;
+            if(deathTimer<=0)
+            {
+                PrefabManager.DeployExplosionParticles(this.transform.position, 0.5f);
+                SoundPlayer.PlaySound(Sound.Explosion1);
+                Destroy(this.gameObject);
+            }
+        }
 
         if(attachedTo!=null)
         if(attachedTo.tag == "PlayerShip")

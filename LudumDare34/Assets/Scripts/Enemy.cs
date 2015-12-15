@@ -34,12 +34,14 @@ public class Enemy : MonoBehaviour {
             {
                 if (modules[i] != null)
                 {
-                    modules[i].attachedTo = null;
-                    modules[i].transform.parent = null;
+                 //   modules[i].attachedTo = null;
+                  //  modules[i].transform.parent = null;
+                    modules[i].Disconnect();
                 }
             }
             PrefabManager.DeployExplosionParticles((this.tag == "EnemyShip" ? this.transform.position : this.spriteTransform.position), 1f);
             GameStateManager.instance.enemies.Remove(this.transform);
+            SoundPlayer.PlaySound(Sound.Explosion1);
             Destroy(this.gameObject);
         }
     }

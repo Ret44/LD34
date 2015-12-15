@@ -44,6 +44,7 @@ public class Hook : MonoBehaviour {
             module.attachedToHook = true;
             attachedObject.GetComponent<WeaponModule>().attachedTo = this.transform;
             extending = false;
+            SoundPlayer.PlaySound(Sound.Grab);
         }
     }
 

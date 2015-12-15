@@ -75,6 +75,7 @@ public class Player : MonoBehaviour {
         instance.modules.Add(newModule);
         GameObject newPopup = Instantiate(PrefabManager.instance.textPopup, new Vector3(instance.transform.position.x, instance.transform.position.y, -5f), Quaternion.identity) as GameObject;
         newPopup.GetComponent<Popup>().mesh.text = newModule.name;
+        SoundPlayer.PlaySound(Sound.Stack);
         return true;
     }
 
@@ -84,6 +85,12 @@ public class Player : MonoBehaviour {
 
         if (instance.HP <= 0)
         {
+            foreach(WeaponModule module in instance.modules)
+            {
+                module.transform.parent = null;
+                module.deathTimer = Random.Range(0f, 1f);
+                module.attachedTo = null;
+            }
             PrefabManager.DeployExplosionParticles(instance.transform.position,1.2f);
             GameObject[] kamikazis = GameObject.FindGameObjectsWithTag("Kamikaze");
             foreach(GameObject kamikaze in kamikazis)
