@@ -41,6 +41,7 @@ public class GameStateManager : MonoBehaviour {
     public float multilpier;
     public List<List<WaveParam>> waves;
 
+    private float wavedelay = 2f;
     public List<Transform> enemies;
 	// Use this for initialization
 
@@ -101,7 +102,13 @@ public class GameStateManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKey(KeyCode.N) && enemies.Count == 0) StartNextWave();
+        wavedelay -= Time.deltaTime;
+        if(wavedelay<0 && enemies.Count == 0)
+        {
+            wavedelay = 4f;
+            StartNextWave();
+        }
+        //if (Input.GetKey(KeyCode.N) && enemies.Count == 0) StartNextWave();
         if (Input.GetKey(KeyCode.R)) Application.LoadLevel("mainscene");
 	}
 }

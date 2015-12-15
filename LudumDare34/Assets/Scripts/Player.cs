@@ -76,12 +76,16 @@ public class Player : MonoBehaviour {
         GameObject newPopup = Instantiate(PrefabManager.instance.textPopup, new Vector3(instance.transform.position.x, instance.transform.position.y, -5f), Quaternion.identity) as GameObject;
         newPopup.GetComponent<Popup>().mesh.text = newModule.name;
         SoundPlayer.PlaySound(Sound.Stack);
+        instance.HP += 50;
+        instance.hullUI.text = (instance.HP * 100 / instance.MaxHP).ToString() + "%";
+
         return true;
     }
 
     public static void Hit(int dmg)
     {
         instance.HP -= dmg;
+        instance.hullUI.text = (instance.HP * 100 / instance.MaxHP).ToString() + "%";
 
         if (instance.HP <= 0)
         {
