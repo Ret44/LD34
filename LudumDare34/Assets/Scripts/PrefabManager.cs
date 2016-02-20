@@ -21,7 +21,9 @@ public class PrefabManager : MonoBehaviour {
     public GameObject fighter;
     public GameObject cruiser;
     public GameObject laser;
+    public GameObject laser2;
     public GameObject kamikaze;
+    public GameObject shielder;
     
 
     void Awake()
@@ -61,7 +63,9 @@ public class PrefabManager : MonoBehaviour {
             case EnemyType.Fighter: return instance.fighter;
             case EnemyType.Cruiser: return instance.cruiser;
             case EnemyType.Laser: return instance.laser;
+            case EnemyType.Laser2: return instance.laser2;
             case EnemyType.Kamikaze: return instance.kamikaze;
+            case EnemyType.Shielder: return instance.shielder;
             default: return instance.fighter;
         }
     }

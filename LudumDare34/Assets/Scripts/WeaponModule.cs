@@ -5,7 +5,8 @@ public enum WeaponType {
     Bullet,
     Rocket,
     Plasma,
-    Laser
+    Laser,
+    Shield
 }
 
 public class WeaponModule : MonoBehaviour {
@@ -41,9 +42,11 @@ public class WeaponModule : MonoBehaviour {
 
     public void DispatchBullet()
     {
-        Debug.Log("Module " + name + " shoots bang bang");
-        GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule ? tmpRotation : this.transform.rotation)) as GameObject;
-        Projectile proj = bulletObj.GetComponent<Projectile>();
+        //Debug.Log("Module " + name + " shoots bang bang");
+        //GameObject bulletObj = Instantiate(PrefabManager.GetBulletPrefab(type), tip.position, (coreModule ? tmpRotation : this.transform.rotation)) as GameObject;
+        //Projectile proj = bulletObj.GetComponent<Projectile>();
+        Projectile proj = BulletPoolManager.DispatchProjectile(type, tip.position, (coreModule ? tmpRotation : this.transform.rotation));
+        proj.type = type;        
         proj.damage = this.damage;
         if (tmpOwner == ProjectileOwner.Enemy)
         {
@@ -101,6 +104,7 @@ public class WeaponModule : MonoBehaviour {
         direction = new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), 0f);
         velocity = Random.Range(2f, 3.5f);
         deathTimer = 5f;
+        this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, -2f);
     }
 
     void OnTriggerEnter(Collider col)
@@ -128,6 +132,31 @@ public class WeaponModule : MonoBehaviour {
                 other.connectedWith = this;
                 attachedToHook = false;
                 Player.AddModule(this);
+            }
+        }
+        if (col.gameObject.tag == "Module" && this.attachedTo!=null)
+        {
+            WeaponModule other = col.GetComponent<WeaponModule>();
+            if(other != null)
+            if(other.attachedTo!=null)
+                if(other.attachedTo.tag=="EnemyShip" && this.attachedTo.tag=="PlayerShip")
+                {
+                    Player.Hit(other.hp);
+                    other.Hit(30);                    
+                }
+
+        }
+
+        if ((col.gameObject.tag == "EnemyShip" || col.gameObject.tag == "Kamikaze") && this.attachedTo != null)
+        {
+            if (this.attachedTo.tag == "PlayerShip")
+            {
+                Enemy enemy = col.gameObject.GetComponent<Enemy>();
+                if (enemy != null)
+                {
+                    Player.Hit(50);
+                    enemy.Hit(30);
+                }
             }
         }
     }
@@ -170,7 +199,7 @@ public class WeaponModule : MonoBehaviour {
         }
         else blink = 1f;
 
-        sprite.color = new Color(1f, blink, blink);
+      sprite.color = new Color(1f, blink, blink);
 
         if(attachedTo==null)
         {

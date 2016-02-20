@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour {
     private SpriteRenderer sprite;
     private float blink;
     public Transform modulesRoot;	// Use this for initialization
-
+    public int ptsValue;
     void Awake()
     {
         blink = 1f;
@@ -36,12 +36,21 @@ public class Enemy : MonoBehaviour {
                 {
                  //   modules[i].attachedTo = null;
                   //  modules[i].transform.parent = null;
-                    modules[i].Disconnect();
+
+                    if (modules[i].type == WeaponType.Shield) {
+                        modules[i].transform.parent = null;
+                        modules[i].deathTimer = 0f;  //Random.Range(0f, 1f);
+                        modules[i].attachedTo = null;
+                    } else modules[i].Disconnect();               
+                    
                 }
             }
             PrefabManager.DeployExplosionParticles((this.tag == "EnemyShip" ? this.transform.position : this.spriteTransform.position), 1f);
             GameStateManager.instance.enemies.Remove(this.transform);
             SoundPlayer.PlaySound(Sound.Explosion1);
+            GameStateManager.instance.enemyCount--;
+            GameStateManager.instance.points += this.ptsValue;
+            Player.enemiesDestroyed++;
             Destroy(this.gameObject);
         }
     }

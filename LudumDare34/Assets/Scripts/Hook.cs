@@ -67,7 +67,7 @@ public class Hook : MonoBehaviour {
 
             ///if()
 
-            Time.timeScale = timeScaleController;
+            if(GameStateManager.GetState() != GameState.PreWave) Time.timeScale = timeScaleController;
             if (Player.instance != null)
             {
                 if (extending)
